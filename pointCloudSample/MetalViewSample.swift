@@ -57,7 +57,7 @@ struct MetalDepthView: View {
 
     // Save the user's confidence selection.
     @State private var selectedConfidence = 0
-    // Set the depth view's state data.
+    // Set the depth view's state data.i
     @State var isToUpsampleDepth = false
     @State var isShowSmoothDepth = false
     @State var isArPaused = false
@@ -71,9 +71,7 @@ struct MetalDepthView: View {
         } else {
             NavigationView {
                 GeometryReader { geometry in
-                    VStack(alignment: .leading) {
-                        // Size the point cloud view relative to the underlying
-                        // 3D geometry by matching the textures' aspect ratio.
+                    ScrollView(.vertical) {
                         HStack {
                             Spacer()
                             MetalPointCloud(mtkView: MTKView(), arData: arProvider, confSelection: $selectedConfidence, scaleMovement: $scaleMovement)
@@ -86,7 +84,7 @@ struct MetalDepthView: View {
                                 ForEach(0..<confLevels.count) { index in
                                     Text(self.confLevels[index]).tag(index)
                                 }
-                                
+
                             }.pickerStyle(SegmentedPickerStyle())
                         }.padding(.horizontal)
                         HStack {
