@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		4981C3C9277950F800A7F517 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4981C3C8277950F800A7F517 /* LaunchScreen.storyboard */; };
+		49C81616277F858A00CC2D67 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49C81615277F858A00CC2D67 /* Assets.xcassets */; };
 		AED3761A2757534400C631A2 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED376192757534400C631A2 /* EnvironmentVariables.swift */; };
-		E4DF0B0824CF1A1D0024833B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4DF0B0724CF1A1D0024833B /* Assets.xcassets */; };
 		E4DF0B1B24CF1A810024833B /* MetalViewSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF0B1224CF1A7F0024833B /* MetalViewSample.swift */; };
 		E4DF0B1C24CF1A810024833B /* MetalTextureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF0B1324CF1A7F0024833B /* MetalTextureView.swift */; };
 		E4DF0B1D24CF1A810024833B /* MetalTextureViewDepth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF0B1424CF1A7F0024833B /* MetalTextureViewDepth.swift */; };
@@ -23,12 +23,12 @@
 
 /* Begin PBXFileReference section */
 		4981C3C8277950F800A7F517 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		49C81615277F858A00CC2D67 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../../Downloads/AppIcons/Assets.xcassets; sourceTree = "<group>"; };
 		762CB549210F49954E02A215 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		862BDBE3A68AAEF29B3782C1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9F60FDDEE7A7673198CD3F7A /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		AED376192757534400C631A2 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentVariables.swift; sourceTree = "<group>"; };
 		E4DF0AFE24CF1A1A0024833B /* pointCloudSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pointCloudSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4DF0B0724CF1A1D0024833B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4DF0B0C24CF1A1D0024833B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4DF0B1224CF1A7F0024833B /* MetalViewSample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalViewSample.swift; sourceTree = "<group>"; };
 		E4DF0B1324CF1A7F0024833B /* MetalTextureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalTextureView.swift; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 				E4DF0B1424CF1A7F0024833B /* MetalTextureViewDepth.swift */,
 				E4DF0B1224CF1A7F0024833B /* MetalViewSample.swift */,
 				E4DF0B1924CF1A800024833B /* shaders.metal */,
-				E4DF0B0724CF1A1D0024833B /* Assets.xcassets */,
+				49C81615277F858A00CC2D67 /* Assets.xcassets */,
 				E4DF0B0C24CF1A1D0024833B /* Info.plist */,
 				4981C3C8277950F800A7F517 /* LaunchScreen.storyboard */,
 			);
@@ -166,7 +166,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4DF0B0824CF1A1D0024833B /* Assets.xcassets in Resources */,
+				49C81616277F858A00CC2D67 /* Assets.xcassets in Resources */,
 				4981C3C9277950F800A7F517 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -330,7 +330,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.SceneDepthPointCloud49FGD8QDJT${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -356,7 +357,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.SceneDepthPointCloud49FGD8QDJT${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;

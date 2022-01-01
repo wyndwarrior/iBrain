@@ -69,8 +69,8 @@ final class CoordinatorPointCloud: MTKCoordinator {
         
         var orientationOrig: simd_float4x4 = simd_float4x4()
         // Since the camera stream is rotated clockwise, rotate it back.
-        orientationOrig.columns.0 = [0, -1, 0, 0]
-        orientationOrig.columns.1 = [-1, 0, 0, 0]
+        orientationOrig.columns.0 = [1, 0, 0, 0]
+        orientationOrig.columns.1 = [0, -1, 0, 0]
         orientationOrig.columns.2 = [0, 0, 1, 0]
         orientationOrig.columns.3 = [0, 0, 0, 1]
         

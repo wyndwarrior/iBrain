@@ -56,14 +56,13 @@ struct MetalDepthView: View {
     let ciContext: CIContext = CIContext()
 
     // Save the user's confidence selection.
-    @State private var selectedConfidence = 0
+    @State private var selectedConfidence = 2
     // Set the depth view's state data.i
-    @State var isToUpsampleDepth = false
     @State var isShowSmoothDepth = false
     @State var isArPaused = false
     @State private var scaleMovement: Float = 1.5
     
-    var confLevels = ["🔵🟢🔴", "🔵🟢", "🔵"]
+    var confLevels = ["low", "med", "high"]
  
     var body: some View {
         if !ARWorldTrackingConfiguration.supportsFrameSemantics([.sceneDepth, .smoothedSceneDepth]) {
@@ -72,11 +71,17 @@ struct MetalDepthView: View {
             NavigationView {
                 GeometryReader { geometry in
                     ScrollView(.vertical) {
-                        HStack {
-                            Spacer()
-                            MetalPointCloud(mtkView: MTKView(), arData: arProvider, confSelection: $selectedConfidence, scaleMovement: $scaleMovement)
-                                .zoomOnTapModifier(height: geometry.size.width / 2 / sizeW * sizeH, width: geometry.size.width / 2, title: "")
-                            Spacer()
+                        
+                        ScrollView(.horizontal) {
+                            HStack() {
+                                MetalTextureViewDepth(mtkView: MTKView(), content: arProvider.depthContent, confSelection: $selectedConfidence).rotationEffect(.degrees(-90))
+                                    .zoomOnTapModifier(height: sizeH, width: sizeW, title: "Depth").frame(width: sizeH, height: sizeW)
+                                MetalTextureViewConfidence(mtkView: MTKView(), content: arProvider.confidenceContent).rotationEffect(.degrees(-90))
+                                    .zoomOnTapModifier(height: sizeH, width: sizeW, title: "Confidence").frame(width: sizeH, height: sizeW)
+                                MetalPointCloud(mtkView: MTKView(), arData: arProvider, confSelection: $selectedConfidence, scaleMovement: $scaleMovement)
+                                    .zoomOnTapModifier(height: sizeW, width: sizeH, title: "")
+                                
+                            }
                         }
                         HStack {
                             Text("Confidence Select:")
@@ -88,42 +93,17 @@ struct MetalDepthView: View {
                             }.pickerStyle(SegmentedPickerStyle())
                         }.padding(.horizontal)
                         HStack {
-                            Text("Scale Movement: ")
-                            Slider(value: $scaleMovement, in: -3...10, step: 0.5)
-                            Text(String(format: "%.1f", scaleMovement))
-                        }.padding(.horizontal)
-                        HStack {
-                            Toggle("Guided Filter", isOn: $isToUpsampleDepth).onChange(of: isToUpsampleDepth) { _ in
-                                isToUpsampleDepth.toggle()
-                                arProvider.isToUpsampleDepth = isToUpsampleDepth
-                            }.frame(width: 160, height: 30)
-                            Toggle("Smooth", isOn: $isShowSmoothDepth).onChange(of: isShowSmoothDepth) { _ in
-                                isShowSmoothDepth.toggle()
-                                arProvider.isUseSmoothedDepthForUpsampling = isShowSmoothDepth
-                            }.frame(width: 160, height: 30)
                             Spacer()
                             Button(action: {
-                                isArPaused.toggle()
-                                isArPaused ? arProvider.pause() : arProvider.start()
+                                arProvider.capture()
                             }) {
-                                Image(systemName: isArPaused ? "play.circle" : "pause.circle").resizable().frame(width: 30, height: 30)
+                                HStack{
+                                    Image(systemName: isArPaused ? "record.circle" : "record.circle").resizable().frame(width: 60, height: 60)
+                                    Text("Capture")
+                                }
                             }
                         }.padding(.horizontal)
                         
-                        ScrollView(.horizontal) {
-                            HStack() {
-                                MetalTextureViewDepth(mtkView: MTKView(), content: arProvider.depthContent, confSelection: $selectedConfidence)
-                                    .zoomOnTapModifier(height: sizeH, width: sizeW, title: isToUpsampleDepth ? "Upscaled Depth" : "Depth")
-                                MetalTextureViewConfidence(mtkView: MTKView(), content: arProvider.confidenceContent)
-                                    .zoomOnTapModifier(height: sizeH, width: sizeW, title: "Confidence")
-                                if isToUpsampleDepth {
-                                    Image(arProvider.upscaledCoef.texture!, ciContext: ciContext,
-                                          scale: 1.0, orientation: .leftMirrored, label: Text("Upscale Coefficients")).resizable()
-                                        .zoomOnTapModifier(height: sizeH, width: sizeW, title: "Upscale Coefficients")
-                                }
-                                
-                            }
-                        }
                         Spacer()
                     }
                 }

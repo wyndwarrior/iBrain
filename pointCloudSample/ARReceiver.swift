@@ -50,19 +50,23 @@ final class ARReceiver: NSObject, ARSessionDelegate {
     }
     
     
-    func get_png(pxbuffer: CVPixelBuffer? ) -> String?{
+    func get_png(pxbuffer: CVPixelBuffer? ) -> Data?{
         if let buffer = pxbuffer {
             let ciimage = CIImage(cvPixelBuffer: buffer)
             let context = CIContext(options: nil)
             guard let cameraImage = context.createCGImage(ciimage, from: ciimage.extent) else {return nil}
             let uiimage = UIImage(cgImage: cameraImage)
             let imageData = uiimage.pngData();
-            return imageData?.base64EncodedString();
-//            let pngImage = UIImage(data:imageData)!;
-//            UIImageWriteToSavedPhotosAlbum(pngImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
-//            print(uiimage)
+            return imageData;
         }
         return nil;
+    }
+    
+    func save_png(pxbuffer: CVPixelBuffer? ){
+        if let png_data = get_png(pxbuffer: pxbuffer) {
+            let pngImage = UIImage(data:png_data)!;
+            UIImageWriteToSavedPhotosAlbum(pngImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        }
     }
 
     @objc func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
@@ -94,28 +98,27 @@ final class ARReceiver: NSObject, ARSessionDelegate {
         return convertedDepthMap
     }
     
-    func pause() {
-        arSession.pause()
-//        print(arData.colorImage, arData.depthImage, arData.cameraResolution, arData.cameraIntrinsics)
+    func capture() {
 
-        
         if let depthImage = arData.depthImage{
             let jsonDict: [String : Any] = [
                 "intrinsic_matrix" : (0 ..< 3).map{ x in
                     (0 ..< 3).map{ y in arData.cameraIntrinsics[x][y]}
                 },
                 "depth_data" : convertDepthData(depthMap: depthImage),
-                "camera_image": get_png(pxbuffer: arData.colorImage),
-                "confidence_image": get_png(pxbuffer: arData.confidenceImage)
+                "camera_image": get_png(pxbuffer: arData.colorImage)?.base64EncodedString(),
+                "confidence_image": get_png(pxbuffer: arData.confidenceImage)?.base64EncodedString()
             ]
             let jsonStringData = try! JSONSerialization.data(
                 withJSONObject: jsonDict
             )
             print(jsonStringData)
-            
+            save_png(pxbuffer: depthImage)
+            save_png(pxbuffer: arData.colorImage)
+            save_png(pxbuffer: arData.confidenceImage)
             
             // create post request
-            let url = URL(string: "https://dab7-40-142-34-149.ngrok.io/brain_api")!
+            let url = URL(string: "https://covariant-ibrain.ngrok.io/brain_api")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -146,11 +149,10 @@ final class ARReceiver: NSObject, ARSessionDelegate {
             task.resume()
             
         }
-        
-        
-//        save_img(pxbuffer: arData.colorImage)
-//        save_img(pxbuffer: arData.depthImage)
-//        save_img(pxbuffer: arData.confidenceImage)
+    }
+    
+    func pause() {
+        arSession.pause()
     }
   
     // Send required data from `ARFrame` to the delegate class via the `onNewARData` callback.

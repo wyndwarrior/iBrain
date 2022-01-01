@@ -113,6 +113,10 @@ final class ARProvider: ARDataReceiver, ObservableObject {
         arReceiver.pause()
     }
     
+    func capture() {
+        arReceiver.capture()
+    }
+    
     // Initialize the MPS filters, metal pipeline, and Metal textures.
     init?() {
         do {
