@@ -39,6 +39,7 @@ extension CVPixelBuffer {
 // to a Metal texture, optionally upscaling depth data using a guided filter,
 // and implements `ARDataReceiver` to respond to `onNewARData` events.
 final class ARProvider: ARDataReceiver, ObservableObject {
+    private var observation: NSKeyValueObservation?
     // Set the destination resolution for the upscaled algorithm.
     let upscaledWidth = 960
     let upscaledHeight = 760
@@ -57,6 +58,9 @@ final class ARProvider: ARDataReceiver, ObservableObject {
     
     let arReceiver = ARReceiver()
     @Published var lastArData: ARData?
+    @Published var uploading: Bool = false
+    @Published var progress: Double = 0.0
+    
     let depthContent = MetalTextureContent()
     let confidenceContent = MetalTextureContent()
     let colorYContent = MetalTextureContent()
@@ -113,8 +117,120 @@ final class ARProvider: ARDataReceiver, ObservableObject {
         arReceiver.pause()
     }
     
+    
+    func get_png(pxbuffer: CVPixelBuffer? ) -> Data?{
+        if let buffer = pxbuffer {
+            let ciimage = CIImage(cvPixelBuffer: buffer)
+            let context = CIContext(options: nil)
+            guard let cameraImage = context.createCGImage(ciimage, from: ciimage.extent) else {return nil}
+            let uiimage = UIImage(cgImage: cameraImage)
+            let imageData = uiimage.pngData();
+            return imageData;
+        }
+        return nil;
+    }
+    
+    func save_png(pxbuffer: CVPixelBuffer? ){
+        if let png_data = get_png(pxbuffer: pxbuffer) {
+            let pngImage = UIImage(data:png_data)!;
+            UIImageWriteToSavedPhotosAlbum(pngImage, nil, nil, nil)
+        }
+    }
+    
+    func convertDepthData(depthMap: CVPixelBuffer) -> [[Float32]] {
+        let width = CVPixelBufferGetWidth(depthMap)
+        let height = CVPixelBufferGetHeight(depthMap)
+        var convertedDepthMap: [[Float32]] = Array(
+            repeating: Array(repeating: 0, count: width),
+            count: height
+        )
+        CVPixelBufferLockBaseAddress(depthMap, CVPixelBufferLockFlags(rawValue: 2))
+        let floatBuffer = unsafeBitCast(
+            CVPixelBufferGetBaseAddress(depthMap),
+            to: UnsafeMutablePointer<Float32>.self
+        )
+        for row in 0 ..< height {
+            for col in 0 ..< width {
+                convertedDepthMap[row][col] = floatBuffer[width * row + col]
+            }
+        }
+        CVPixelBufferUnlockBaseAddress(depthMap, CVPixelBufferLockFlags(rawValue: 2))
+        return convertedDepthMap
+    }
+    
     func capture() {
-        arReceiver.capture()
+        
+        self.pause()
+
+        if let arData = lastArData, let depthImage = arData.depthImage{
+            let jsonDict: [String : Any] = [
+                "intrinsic_matrix" : (0 ..< 3).map{ x in
+                    (0 ..< 3).map{ y in arData.cameraIntrinsics[x][y]}
+                },
+                "depth_data" : convertDepthData(depthMap: depthImage),
+                "camera_image": get_png(pxbuffer: arData.colorImage)?.base64EncodedString(),
+                "confidence_image": get_png(pxbuffer: arData.confidenceImage)?.base64EncodedString()
+            ]
+            let jsonStringData = try! JSONSerialization.data(
+                withJSONObject: jsonDict
+            )
+            print(jsonStringData)
+            save_png(pxbuffer: depthImage)
+            save_png(pxbuffer: arData.colorImage)
+            
+            // create post request
+            let url = URL(string: "https://covariant-ibrain.ngrok.io/brain_api")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            // insert json data to the request
+            request.httpBody = jsonStringData
+            uploading = true
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                DispatchQueue.main.async {
+                    self.uploading = false
+                }
+                guard let data = data, error == nil else {
+                    DispatchQueue.main.async {
+                        let alertVC = UIAlertController(title: "Error", message: error?.localizedDescription ?? "No data", preferredStyle: .alert)
+                        let okAction = UIAlertAction(title: "OK", style: .default) { (action: UIAlertAction) in
+                        }
+                        alertVC.addAction(okAction)
+                        
+                        let viewController = UIApplication.shared.windows.first!.rootViewController!
+                        viewController.present(alertVC, animated: true, completion: nil)
+                    }
+                    print(error?.localizedDescription ?? "No data")
+                    return
+                }
+                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let responseJSON = responseJSON as? [String: Any] {
+                    print(responseJSON)
+                    if responseJSON.keys.contains("link"){
+                        if let url = URL(string: responseJSON["link"] as! String) {
+                            DispatchQueue.main.async {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                    } else if responseJSON.keys.contains("error"){
+                        print(responseJSON["error"])
+                    }
+                }
+            }
+            
+            observation = task.progress.observe(\.fractionCompleted) { progress, _ in
+                DispatchQueue.main.async {
+                    self.progress = progress.fractionCompleted
+                }
+            }
+
+            task.resume()
+            
+        }
+        
+        self.start()
     }
     
     // Initialize the MPS filters, metal pipeline, and Metal textures.

@@ -43,6 +43,7 @@ extension Image {
         self.init(cgimage!, scale: 1.0, orientation: .leftMirrored, label: label)
     }
 }
+
 //- Tag: MetalDepthView
 struct MetalDepthView: View {
     
@@ -93,6 +94,9 @@ struct MetalDepthView: View {
                             }.pickerStyle(SegmentedPickerStyle())
                         }.padding(.horizontal)
                         HStack {
+                            if arProvider.uploading{
+                                Text(String(format:"Uploading %.2f%%, this may take some time..." , arProvider.progress*100))
+                            }
                             Spacer()
                             Button(action: {
                                 arProvider.capture()
@@ -101,13 +105,14 @@ struct MetalDepthView: View {
                                     Image(systemName: isArPaused ? "record.circle" : "record.circle").resizable().frame(width: 60, height: 60)
                                     Text("Capture")
                                 }
-                            }
+                            }.disabled(arProvider.uploading)
                         }.padding(.horizontal)
                         
                         Spacer()
                     }
                 }
             }.navigationViewStyle(StackNavigationViewStyle())
+            
         }
     }
 }
