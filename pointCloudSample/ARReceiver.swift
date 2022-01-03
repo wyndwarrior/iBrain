@@ -25,12 +25,16 @@ final class ARData {
     var confidenceSmoothImage: CVPixelBuffer?
     var cameraIntrinsics = simd_float3x3()
     var cameraResolution = CGSize()
+    var pointcloud: ARPointCloud?
+    var lastARImage: ARImageData?
+    var lastUWImage: ARImageData?
 }
 
 // Configure and run an AR session to provide the app with depth-related AR data.
 final class ARReceiver: NSObject, ARSessionDelegate {
     var arData = ARData()
     var arSession = ARSession()
+    var lastFrame: Any? = nil
     weak var delegate: ARDataReceiver?
     
     // Configure and start the ARSession.
@@ -63,7 +67,23 @@ final class ARReceiver: NSObject, ARSessionDelegate {
             arData.colorImage = frame.capturedImage
             arData.cameraIntrinsics = frame.camera.intrinsics
             arData.cameraResolution = frame.camera.imageResolution
+            arData.pointcloud = frame.capturedPointCloudData
             delegate?.onNewARData(arData: arData)
+            
+            
+            if let testFrame: ARFrameContext = self.lastFrame as? ARFrameContext{
+                if let imageData = testFrame.imageData, let UWimage = imageData.latestUltraWideImage{
+                    print(imageData)
+                    print(UWimage)
+                    print(imageData.calibrationData)
+                    print(UWimage.calibrationData)
+                    print(UWimage.extrinsicsMap)
+                    print(imageData.extrinsicsMap)
+                    print(imageData.pointCloud, imageData.pointCloud.points.count)
+                }
+            }
+            
+            self.lastFrame = arSession.value(forKey: "_nextFrameContext")
         }
     }
 }

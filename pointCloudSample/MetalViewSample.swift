@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import MetalKit
 import ARKit
+import FLEX
 
 // Add a title to a view that enlarges the view to full screen on tap.
 struct Texture<T: View>: ViewModifier {
@@ -72,7 +73,6 @@ struct MetalDepthView: View {
             NavigationView {
                 GeometryReader { geometry in
                     ScrollView(.vertical) {
-                        
                         ScrollView(.horizontal) {
                             HStack() {
                                 MetalTextureViewDepth(mtkView: MTKView(), content: arProvider.depthContent, confSelection: $selectedConfidence).rotationEffect(.degrees(-90))
@@ -98,6 +98,12 @@ struct MetalDepthView: View {
                                 Text(String(format:"Uploading %.2f%%, this may take some time..." , arProvider.progress*100))
                             }
                             Spacer()
+                            Button(action: {
+                                FLEXManager.shared.showExplorer()
+                            }){
+                                Text("Flex")
+                                
+                            }
                             Button(action: {
                                 arProvider.capture()
                             }) {

@@ -3,11 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		490C480B2781692900DBBA56 /* FLEX in Frameworks */ = {isa = PBXBuildFile; productRef = 490C480A2781692900DBBA56 /* FLEX */; };
+		49433C642782141E0092D4BC /* ARSessionCore.h in Sources */ = {isa = PBXBuildFile; fileRef = 49433C63278212D90092D4BC /* ARSessionCore.h */; };
 		4981C3C9277950F800A7F517 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4981C3C8277950F800A7F517 /* LaunchScreen.storyboard */; };
+		49B29EE52782609A00E5970D /* AppleDepth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49B29EE42782609A00E5970D /* AppleDepth.framework */; platformFilter = ios; };
 		49C81616277F858A00CC2D67 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49C81615277F858A00CC2D67 /* Assets.xcassets */; };
 		AED3761A2757534400C631A2 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED376192757534400C631A2 /* EnvironmentVariables.swift */; };
 		E4DF0B1B24CF1A810024833B /* MetalViewSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF0B1224CF1A7F0024833B /* MetalViewSample.swift */; };
@@ -22,7 +25,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		49433C63278212D90092D4BC /* ARSessionCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARSessionCore.h; sourceTree = "<group>"; };
 		4981C3C8277950F800A7F517 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		49B29EDB27825FC400E5970D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
+		49B29EDD27825FEB00E5970D /* AppleDepth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppleDepth.framework; path = ../../Downloads/SDK/PrivateFrameworks/AppleDepth.framework; sourceTree = "<group>"; };
+		49B29EE42782609A00E5970D /* AppleDepth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AppleDepth.framework; sourceTree = "<group>"; };
 		49C81615277F858A00CC2D67 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../../Downloads/AppIcons/Assets.xcassets; sourceTree = "<group>"; };
 		762CB549210F49954E02A215 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		862BDBE3A68AAEF29B3782C1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -46,6 +53,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				490C480B2781692900DBBA56 /* FLEX in Frameworks */,
+				49B29EE52782609A00E5970D /* AppleDepth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,6 +69,15 @@
 			path = LICENSE;
 			sourceTree = "<group>";
 		};
+		49B29EDA27825FC400E5970D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				49B29EDD27825FEB00E5970D /* AppleDepth.framework */,
+				49B29EDB27825FC400E5970D /* ARKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5EFDC8C637DAF513A104E75C /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -72,10 +90,12 @@
 			isa = PBXGroup;
 			children = (
 				862BDBE3A68AAEF29B3782C1 /* README.md */,
+				49B29EE42782609A00E5970D /* AppleDepth.framework */,
 				E4DF0B0024CF1A1A0024833B /* pointCloudSample */,
 				E4DF0AFF24CF1A1A0024833B /* Products */,
 				5EFDC8C637DAF513A104E75C /* Configuration */,
 				327985EB5368B1486905D62D /* LICENSE */,
+				49B29EDA27825FC400E5970D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -94,6 +114,7 @@
 				E4DF0B1724CF1A800024833B /* PointCloudDepthSample.swift */,
 				AED376192757534400C631A2 /* EnvironmentVariables.swift */,
 				E4DF0B1524CF1A800024833B /* ARReceiver.swift */,
+				49433C63278212D90092D4BC /* ARSessionCore.h */,
 				E4DF0B1A24CF1A810024833B /* MetalPointCloud.swift */,
 				E4DF0B1324CF1A7F0024833B /* MetalTextureView.swift */,
 				E4DF0B1624CF1A800024833B /* MetalTextureViewConfidence.swift */,
@@ -123,6 +144,9 @@
 			dependencies = (
 			);
 			name = pointCloudSample;
+			packageProductDependencies = (
+				490C480A2781692900DBBA56 /* FLEX */,
+			);
 			productName = pointCloudSample;
 			productReference = E4DF0AFE24CF1A1A0024833B /* pointCloudSample.app */;
 			productType = "com.apple.product-type.application";
@@ -152,6 +176,9 @@
 				Base,
 			);
 			mainGroup = E4DF0AF524CF1A1A0024833B;
+			packageReferences = (
+				490C48092781692900DBBA56 /* XCRemoteSwiftPackageReference "FLEX" */,
+			);
 			productRefGroup = E4DF0AFF24CF1A1A0024833B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -178,6 +205,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49433C642782141E0092D4BC /* ARSessionCore.h in Sources */,
 				E4DF0B2224CF1A810024833B /* shaders.metal in Sources */,
 				E4DF0B1D24CF1A810024833B /* MetalTextureViewDepth.swift in Sources */,
 				E4DF0B1C24CF1A810024833B /* MetalTextureView.swift in Sources */,
@@ -325,6 +353,10 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = D6TRM8R82D;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = pointCloudSample/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -332,10 +364,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrain;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrainFlex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = pointCloudSample/ARSessionCore.h;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -353,6 +386,10 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = D6TRM8R82D;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = pointCloudSample/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -360,10 +397,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrain;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wynd07.iBrainFlex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = pointCloudSample/ARSessionCore.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -391,6 +429,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		490C48092781692900DBBA56 /* XCRemoteSwiftPackageReference "FLEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FLEXTool/FLEX.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		490C480A2781692900DBBA56 /* FLEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 490C48092781692900DBBA56 /* XCRemoteSwiftPackageReference "FLEX" */;
+			productName = FLEX;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E4DF0AF624CF1A1A0024833B /* Project object */;
 }

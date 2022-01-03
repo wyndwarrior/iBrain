@@ -11,6 +11,7 @@ import Combine
 import ARKit
 import Accelerate
 import MetalPerformanceShaders
+import FLEX
 
 // Wrap the `MTLTexture` protocol to reference outputs from ARKit.
 final class MetalTextureContent {
@@ -159,13 +160,25 @@ final class ARProvider: ARDataReceiver, ObservableObject {
     }
     
     func capture() {
+
         
         self.pause()
 
-        if let arData = lastArData, let depthImage = arData.depthImage{
+        if let arData = lastArData, let depthImage = arData.depthImage, let pointCloud = arData.pointcloud,
+           let depthPointCloud: ADJasperPointCloud = pointCloud.depthPointCloud() as? ADJasperPointCloud{
+            let pngImage = UIImage(data:depthPointCloud.pngRepresentation() as! Data)!;
+            UIImageWriteToSavedPhotosAlbum(pngImage, nil, nil, nil)
             let jsonDict: [String : Any] = [
                 "intrinsic_matrix" : (0 ..< 3).map{ x in
                     (0 ..< 3).map{ y in arData.cameraIntrinsics[x][y]}
+                },
+                "lidar_point_cloud": pointCloud.points.map{ [$0.x, $0.y, $0.z]},
+                "lidar_confidence": (0 ..< depthPointCloud.length).map{ x in
+                    depthPointCloud.confidences[Int(x)]
+                },
+                "lidar_px": (0 ..< depthPointCloud.length).map{ x in
+                    [depthPointCloud.undistortedCameraPixels[Int(x)].x,
+                    depthPointCloud.undistortedCameraPixels[Int(x)].y]
                 },
                 "depth_data" : convertDepthData(depthMap: depthImage),
                 "camera_image": get_png(pxbuffer: arData.colorImage)?.base64EncodedString(),
@@ -177,6 +190,7 @@ final class ARProvider: ARDataReceiver, ObservableObject {
             print(jsonStringData)
             save_png(pxbuffer: depthImage)
             save_png(pxbuffer: arData.colorImage)
+            
             
             // create post request
             let url = URL(string: "https://covariant-ibrain.ngrok.io/brain_api")!
@@ -231,6 +245,8 @@ final class ARProvider: ARDataReceiver, ObservableObject {
         }
         
         self.start()
+//        self.pause()
+
     }
     
     // Initialize the MPS filters, metal pipeline, and Metal textures.
