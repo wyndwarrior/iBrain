@@ -212,10 +212,10 @@ final class ARProvider: ARDataReceiver, ObservableObject {
                 "confidence_image": get_png(pxbuffer: arData.confidenceImage)?.base64EncodedString()
             ]
             
-            if let arimage = arData.lastARImage, let uwimage = arData.lastUWImage{
-                jsonDict["arimage"] = json_arimage(arimage: arimage)
-                jsonDict["uwimage"] = json_arimage(arimage: uwimage)
-            }
+//            if let arimage = arData.lastARImage, let uwimage = arData.lastUWImage{
+//                jsonDict["arimage"] = json_arimage(arimage: arimage)
+//                jsonDict["uwimage"] = json_arimage(arimage: uwimage)
+//            }
             
             let jsonStringData = try! JSONSerialization.data(
                 withJSONObject: jsonDict
