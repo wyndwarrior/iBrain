@@ -30,7 +30,8 @@
 @end
 
 @interface ARFrame ()
-@property (retain, nonatomic) ARPointCloud *capturedPointCloudData; 
+@property (retain, nonatomic) ARPointCloud *capturedPointCloudData;
+@property (nonatomic) CGFloat timestamp;
 @end
 
 @interface ARPointCloud ()
@@ -47,8 +48,14 @@
 @property (retain, nonatomic) ARPointCloud *pointCloud;
 @property (retain, nonatomic) AVCameraCalibrationData *calibrationData;
 @property (retain, nonatomic) NSMutableDictionary *extrinsicsMap;
+@property (nonatomic) CVBufferRef* pixelBuffer;
+@property (nonatomic) CGFloat timestamp;
 @end
 
+CVPixelBufferRef CastToCVPixelBuffer(void* p)
+{
+    return (CVPixelBufferRef)p;
+}
 
 @interface ARFrameContext : NSObject
 

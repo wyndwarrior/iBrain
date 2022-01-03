@@ -159,20 +159,10 @@ final class ARProvider: ARDataReceiver, ObservableObject {
         return convertedDepthMap
     }
     
-    func capture() {
-
-        
-        self.pause()
-
-        if let arData = lastArData, let depthImage = arData.depthImage, let pointCloud = arData.pointcloud,
-           let depthPointCloud: ADJasperPointCloud = pointCloud.depthPointCloud() as? ADJasperPointCloud{
-            let pngImage = UIImage(data:depthPointCloud.pngRepresentation() as! Data)!;
-            UIImageWriteToSavedPhotosAlbum(pngImage, nil, nil, nil)
-            let jsonDict: [String : Any] = [
-                "intrinsic_matrix" : (0 ..< 3).map{ x in
-                    (0 ..< 3).map{ y in arData.cameraIntrinsics[x][y]}
-                },
-                "lidar_point_cloud": pointCloud.points.map{ [$0.x, $0.y, $0.z]},
+    func json_lidar(lidar: ARPointCloud) -> [String: Any]?{
+        if let depthPointCloud: ADJasperPointCloud = lidar.depthPointCloud() as? ADJasperPointCloud{
+            let lidar_json: [String : Any] = [
+                "lidar_point_cloud": lidar.points.map{ [$0.x, $0.y, $0.z]},
                 "lidar_confidence": (0 ..< depthPointCloud.length).map{ x in
                     depthPointCloud.confidences[Int(x)]
                 },
@@ -180,10 +170,53 @@ final class ARProvider: ARDataReceiver, ObservableObject {
                     [depthPointCloud.undistortedCameraPixels[Int(x)].x,
                     depthPointCloud.undistortedCameraPixels[Int(x)].y]
                 },
+            ]
+            return lidar_json
+        }
+        return nil;
+    }
+    
+    func json_arimage(arimage: ARImageData) -> [String: Any]? {
+        if let pointer = CastToCVPixelBuffer(arimage.pixelBuffer){
+            var json : [String: Any] = [
+                "image": get_png(pxbuffer: pointer.takeUnretainedValue() as? CVPixelBuffer)?.base64EncodedString(),
+                "intrinsic_matrix" : (0 ..< 3).map{ x in
+                    (0 ..< 3).map{ y in arimage.calibrationData.intrinsicMatrix[y][x]}
+                },
+                "extrinsic_matrix" : (0 ..< 3).map{ x in
+                    (0 ..< 4).map{ y in arimage.calibrationData.extrinsicMatrix[y][x]}
+                },
+                "ref_size" : [arimage.calibrationData.intrinsicMatrixReferenceDimensions.height,
+                              arimage.calibrationData.intrinsicMatrixReferenceDimensions.width]
+            ]
+            if let pointCloud = arimage.pointCloud{
+                json["lidar"] = json_lidar(lidar: pointCloud)
+            }
+            print(arimage.calibrationData)
+            return json
+        }
+        return nil
+    }
+    
+    func capture() {
+        self.pause()
+
+        if let arData = lastArData, let depthImage = arData.depthImage, let pointCloud = arData.pointcloud{
+            var jsonDict: [String : Any] = [
+                "intrinsic_matrix" : (0 ..< 3).map{ x in
+                    (0 ..< 3).map{ y in arData.cameraIntrinsics[x][y]}
+                },
+                "lidar": json_lidar(lidar: pointCloud),
                 "depth_data" : convertDepthData(depthMap: depthImage),
                 "camera_image": get_png(pxbuffer: arData.colorImage)?.base64EncodedString(),
                 "confidence_image": get_png(pxbuffer: arData.confidenceImage)?.base64EncodedString()
             ]
+            
+            if let arimage = arData.lastARImage, let uwimage = arData.lastUWImage{
+                jsonDict["arimage"] = json_arimage(arimage: arimage)
+                jsonDict["uwimage"] = json_arimage(arimage: uwimage)
+            }
+            
             let jsonStringData = try! JSONSerialization.data(
                 withJSONObject: jsonDict
             )

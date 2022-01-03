@@ -73,13 +73,8 @@ final class ARReceiver: NSObject, ARSessionDelegate {
             
             if let testFrame: ARFrameContext = self.lastFrame as? ARFrameContext{
                 if let imageData = testFrame.imageData, let UWimage = imageData.latestUltraWideImage{
-                    print(imageData)
-                    print(UWimage)
-                    print(imageData.calibrationData)
-                    print(UWimage.calibrationData)
-                    print(UWimage.extrinsicsMap)
-                    print(imageData.extrinsicsMap)
-                    print(imageData.pointCloud, imageData.pointCloud.points.count)
+                    arData.lastARImage = imageData
+                    arData.lastUWImage = UWimage
                 }
             }
             
