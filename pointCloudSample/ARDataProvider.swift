@@ -123,6 +123,7 @@ final class ARProvider: ARDataReceiver, ObservableObject {
         if let buffer = pxbuffer {
             let ciimage = CIImage(cvPixelBuffer: buffer)
             let context = CIContext(options: nil)
+            print("image extent", ciimage.extent)
             guard let cameraImage = context.createCGImage(ciimage, from: ciimage.extent) else {return nil}
             let uiimage = UIImage(cgImage: cameraImage)
             let imageData = uiimage.pngData();
@@ -141,6 +142,7 @@ final class ARProvider: ARDataReceiver, ObservableObject {
     func convertDepthData(depthMap: CVPixelBuffer) -> [[Float32]] {
         let width = CVPixelBufferGetWidth(depthMap)
         let height = CVPixelBufferGetHeight(depthMap)
+
         var convertedDepthMap: [[Float32]] = Array(
             repeating: Array(repeating: 0, count: width),
             count: height
@@ -178,8 +180,12 @@ final class ARProvider: ARDataReceiver, ObservableObject {
     
     func json_arimage(arimage: ARImageData) -> [String: Any]? {
         if let pointer = CastToCVPixelBuffer(arimage.pixelBuffer){
+            print(arimage.imageResolution)
+            let png_data = get_png(pxbuffer: pointer.takeUnretainedValue() as? CVPixelBuffer)
+            let pngImage = UIImage(data:png_data!)!;
+            UIImageWriteToSavedPhotosAlbum(pngImage, nil, nil, nil)
             var json : [String: Any] = [
-                "image": get_png(pxbuffer: pointer.takeUnretainedValue() as? CVPixelBuffer)?.base64EncodedString(),
+                "image": png_data?.base64EncodedString(),
                 "intrinsic_matrix" : (0 ..< 3).map{ x in
                     (0 ..< 3).map{ y in arimage.calibrationData.intrinsicMatrix[y][x]}
                 },
@@ -212,10 +218,10 @@ final class ARProvider: ARDataReceiver, ObservableObject {
                 "confidence_image": get_png(pxbuffer: arData.confidenceImage)?.base64EncodedString()
             ]
             
-//            if let arimage = arData.lastARImage, let uwimage = arData.lastUWImage{
-//                jsonDict["arimage"] = json_arimage(arimage: arimage)
-//                jsonDict["uwimage"] = json_arimage(arimage: uwimage)
-//            }
+            if let arimage = arData.lastARImage, let uwimage = arData.lastUWImage{
+                jsonDict["arimage"] = json_arimage(arimage: arimage)
+                jsonDict["uwimage"] = json_arimage(arimage: uwimage)
+            }
             
             let jsonStringData = try! JSONSerialization.data(
                 withJSONObject: jsonDict
